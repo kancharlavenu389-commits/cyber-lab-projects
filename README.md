@@ -8,6 +8,8 @@ Analysis Tools: Nmap, Netcat (nc), Wireshark
 🔴 Phase 1: Offensive Execution (Red Team)
 Initial reconnaissance via Nmap identified Port 21 open, running vsftpd 2.3.4.
 While the standard Metasploit module can automate this exploit, I opted for a manual connection to demonstrate the underlying mechanics. The vsftpd 2.3.4 vulnerability allows an attacker to trigger a backdoor by sending a username containing a :) sequence. This opens a secret listener on Port 6200.
+![msf](https://github.com/user-attachments/assets/bc0371c1-1954-4de6-b59b-eea2e204df9a)
+
 ![nc](https://github.com/user-attachments/assets/9546bdaa-0758-4ea7-9f48-d36614881d9b)
 
 Result: Successfully bypassed automated tools, connected directly to Port 6200 via Netcat, and achieved a root shell. Executed credential dumping by reading the /etc/shadow file.
