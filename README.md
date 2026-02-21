@@ -41,6 +41,29 @@ Result: Successfully cracked the SSH credentials by systematically guessing pass
 To simulate a SOC analyst's workflow, I accessed the target machine's raw authentication logs. I used the command grep "Failed password" /var/log/auth.log to parse the file and isolate malicious activity.
 ![grep](https://github.com/user-attachments/assets/27f0d30a-f11b-4693-b719-1a045fa39c75)
 
+
+
+
+
+
+Project 3: Web Application Command Injection & Log Triage
+🎯 Objective
+To exploit a flaw in a web application's input field to gain unauthorized access to the server's operating system and analyze the resulting footprints in the Apache web logs.
+🛠️ Environment
+Victim: DVWA (Damn Vulnerable Web Application) hosted on Metasploitable 2.
+Security Level: Low (to demonstrate raw vulnerability).
+🔴 Phase 1: The Hijack (Red Team)
+I identified a "Ping" search box that was intended only for IP addresses. By using a semicolon (;) as a command separator, I successfully "injected" secondary Linux commands.
+Command Used: 127.0.0.1; whoami; hostname; ls -la
+![dvwa command](https://github.com/user-attachments/assets/75820bc6-aa6a-4621-a1d9-19d45797fd35)
+
+Result: The web server executed my injected commands, revealing the system user as www-data. This confirmed Remote Code Execution (RCE).
+🔵 Phase 2: The Footprint (Blue Team)
+After the attack, I accessed the server's backend to see how the activity was recorded. I used tail /var/log/apache2/access.log to find the evidence.
+![log](https://github.com/user-attachments/assets/85ef456f-f2af-41ef-8763-97128aa8cc85)
+
+Result: The log clearly shows my Kali IP address sending the malicious whoami string. This demonstrates how a SOC analyst can trace a web-based attack back to its source.
+
 Result: The log analysis revealed a massive flood of failed login attempts originating from a single IP address within a very short timeframe. This clear pattern represents a True Positive indicator of an automated brute-force attack.
 🛡️ Remediation Strategy
 Implement account lockout policies (such as Fail2Ban) to temporarily block IP addresses after a set number of failed attempts.
