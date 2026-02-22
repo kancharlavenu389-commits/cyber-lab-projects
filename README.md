@@ -92,3 +92,9 @@ Result: Identified the specific SQLi payload within the web traffic logs, a crit
 🛡️ Remediation
 Prepared Statements: Use parameterized queries to ensure the database treats input as data, not executable code.
 Input Sanitization: Implement strict filtering to block special characters like ', --, and ;.
+
+Phase 3: Cryptanalysis (Hash Cracking)
+The database dump revealed that passwords were encrypted using MD5 hashing. I extracted the hash for the admin user (5f4dcc3b5aa765d61d8327deb882cf99).
+![crack](https://github.com/user-attachments/assets/da34344f-bffe-46b7-8907-95266c300991)
+
+Result: By utilizing a Rainbow Table attack (via CrackStation), I successfully reversed the MD5 hash to discover the plain-text password: password. This highlights the critical flaw of using deprecated hashing algorithms like MD5 without salting.
