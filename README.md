@@ -68,3 +68,27 @@ Result: The log analysis revealed a massive flood of failed login attempts origi
 🛡️ Remediation Strategy
 Implement account lockout policies (such as Fail2Ban) to temporarily block IP addresses after a set number of failed attempts.
 Disable password authentication entirely in favor of cryptographic SSH Key-based authentication.
+
+
+
+
+
+Project 4: Database Exploitation (SQL Injection)
+🎯 Objective
+To demonstrate a SQL Injection (SQLi) attack on a web application to bypass query logic and extract the entire user database.
+🛠️ Environment
+Application: DVWA (Damn Vulnerable Web Application).
+Vulnerability: SQL Injection (Level: Low).
+🔴 Phase 1: Exploitation (Red Team)
+I used a "Tautology" attack string (' OR '1'='1) in the User ID field. This forced the SQL query to always evaluate as "True," causing the database to return all records instead of a single ID.
+![sql](https://github.com/user-attachments/assets/bee4eac1-d9ed-48db-a7ab-bae9a72b8d50)
+
+Result: Successfully extracted a full list of usernames and IDs from the backend database.
+🔵 Phase 2: Log Triage (Blue Team)
+I inspected the Apache access.log to identify the URL-encoded attack signature.
+![sql2](https://github.com/user-attachments/assets/8e65cea5-a6cb-4f6f-854a-6131dfa1e3d2)
+
+Result: Identified the specific SQLi payload within the web traffic logs, a critical skill for threat hunting and incident response.
+🛡️ Remediation
+Prepared Statements: Use parameterized queries to ensure the database treats input as data, not executable code.
+Input Sanitization: Implement strict filtering to block special characters like ', --, and ;.
