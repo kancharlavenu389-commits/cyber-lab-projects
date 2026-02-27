@@ -98,3 +98,55 @@ The database dump revealed that passwords were encrypted using MD5 hashing. I ex
 ![crack](https://github.com/user-attachments/assets/da34344f-bffe-46b7-8907-95266c300991)
 
 Result: By utilizing a Rainbow Table attack (via CrackStation), I successfully reversed the MD5 hash to discover the plain-text password: password. This highlights the critical flaw of using deprecated hashing algorithms like MD5 without salting.
+
+
+
+
+# Project 5: Web Application Security Assessment (DVWA)
+
+## 🎯 Objective
+Conducted a comprehensive vulnerability assessment and penetration test of a PHP-based web application to identify, exploit, and remediate *OWASP Top 10* vulnerabilities.
+
+## 🛠️ Technical Execution & Exploitation
+
+### 🗄️ 1. Data Exfiltration (SQL Injection)
+* *Attack:* Successfully performed *Union-based SQL Injection* to bypass application logic.
+* *Result:* Exfiltrated sensitive user database tables, including MD5 password hashes.
+* *Tooling:* Manual injection and *Burp Suite Proxy* for traffic manipulation.
+
+### 💻 2. Remote Code Execution (Command Injection)
+* *Attack:* Exploited insecure system calls to execute arbitrary OS commands.
+* *Result:* Achieved unauthorized retrieval of system-level configuration files (e.g., /etc/passwd).
+* *Impact:* Demonstrated the risk of complete server takeover via unsanitized input.
+* ![cmd](https://github.com/user-attachments/assets/b2b8fcac-667b-4236-a1d0-8188f3d5c653)
+
+
+### 🍪 3. Session Hijacking (XSS)
+* *Attack:* Identified and exploited *Reflected and Stored XSS* flaws.
+* *Result:* Executed arbitrary JavaScript to exfiltrate active session cookies (PHPSESSID).
+* *Tooling:* Custom![xss](https://github.com/user-attachments/assets/9424d473-f655-48de-a18e-1064eb77fdb3)
+ JS payloads injected into vulnerable web forms.
+
+![sxx](https://github.com/user-attachments/assets/8e91c594-fa90-4b0b-8243-b71498639133)
+
+ 
+
+### 🔑 4. Automated Attacks (Brute Force)
+* *Attack:* Leveraged *Burp Suite Intruder* to conduct automated credential stuffing.
+* *Analysis:* Utilized HTTP response length and status code analysis to identify successful authentication bypasses.
+* ![brute](https://github.com/user-attachments/assets/dc74220e-6e3b-4898-9455-1927478d92e1)
+* ![brute2](https://github.com/user-attachments/assets/f14a4170-b051-4588-942d-e374fdaf3685)
+* ![brute3](https://github.com/user-attachments/assets/e9947e3c-cbb6-4f53-a577-0e4f09b6e898)
+
+
+
+
+---
+
+## 🛡️ Remediation & Defensive Advocacy
+To harden application defenses, I documented the following mitigation strategies:
+* *Parameterized Queries:* Implementation of prepared statements to eliminate SQLi.
+* *Input Validation:* Strict allow-listing of user inputs for system commands.
+* *Output Encoding:* Using context-aware encoding to prevent XSS execution.
+* *Security Headers:* Implementation of *Content Security Policy (CSP)* and *HttpOnly/Secure* cookie flags.
+*
