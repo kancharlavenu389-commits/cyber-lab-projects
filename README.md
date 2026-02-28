@@ -149,4 +149,52 @@ To harden application defenses, I documented the following mitigation strategies
 * *Input Validation:* Strict allow-listing of user inputs for system commands.
 * *Output Encoding:* Using context-aware encoding to prevent XSS execution.
 * *Security Headers:* Implementation of *Content Security Policy (CSP)* and *HttpOnly/Secure* cookie flags.
-*
+
+
+
+
+# Project 6: Full-Chain System Compromise & Forensic Analysis (Web-to-Root)
+
+## 🎯 Objective
+To execute and document a complete attack lifecycle within a controlled Linux environment (Metasploitable 2). The assessment covers initial web exploitation, system-level privilege escalation, and post-incident forensic log analysis.
+
+---
+
+## 🔴 Phase 1: Offensive Execution (Red Team)
+
+### 1. Initial Access via Command Injection
+* *Vulnerability:* Unsanitized user input in the DVWA web application.
+* *Exploit:* Injected OS commands (cat /etc/passwd) directly into the web interface URL parameters.
+* *Result:* Achieved Remote Code Execution (RCE) and gained an initial shell as the low-privilege www-data service account.
+* ![cmdexec](https://github.com/user-attachments/assets/d00ca8da-f69e-4c9a-b85b-3925fe7f4570)
+
+
+### 2. Privilege Escalation (The "Root" Compromise)
+* *Vulnerability:* Misconfigured *SUID (Set owner User ID)* permissions on the nmap binary.
+* *Exploit:* Utilized nmap --interactive to break out of the restricted shell using the !sh escape sequence.
+* *Result:* Successfully escalated privileges from www-data to full administrative control.
+* *Verification:* 
+![netcat](https://github.com/user-attachments/assets/6fae455b-1692-4dcb-850a-b67d52c774a2)
+
+---
+
+## 🔵 Phase 2: Forensic Detection (Blue Team)
+
+### 1. Web Log Analysis (The Entry Point)
+Successfully traced the attacker's initial entry by analyzing the Apache web server logs.
+* *Query:* sudo cat /var/log/apache2/access.log | grep "cat"
+* *Finding:* Identified clear-text OS commands (cat+/etc/passwd) embedded within HTTP GET requests, confirming the exact time and method of the command injection.
+  > ![apche](https://github.com/user-attachments/assets/55ea1d07-952f-4475-88ee-89e33da483e7)
+
+
+### 2. Auth Log Evasion & SUID Stealth
+Conducted an audit of /var/log/auth.log to track the privilege escalation.
+* *Finding:* The escalation to root left *zero footprints* in the standard authentication logs. 
+* *Analysis:* Because the attack exploited a file permission flaw (SUID) rather than a standard authentication mechanism (like sudo or su), it successfully bypassed standard system logging. This highlights the critical danger of SUID vulnerabilities and the need for advanced process-monitoring tools (like Auditd) to detect stealthy lateral movement.
+
+---
+
+## 🛡️ Remediation Strategy
+To harden the system against this attack chain, the following mitigations are required:
+1. *Input Sanitization:* Implement strict allow-listing and shell-escaping functions on all web forms to prevent command chaining (e.g., ;, &&, |).
+2. *Principle of Least Privilege:* Regularly audit system binaries (find / -perm -4000) and remove SUID bits from administrative tools like nmap, vim, or find that allow interactive shell escapes.
