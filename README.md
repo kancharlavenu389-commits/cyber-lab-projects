@@ -198,3 +198,44 @@ Conducted an audit of /var/log/auth.log to track the privilege escalation.
 To harden the system against this attack chain, the following mitigations are required:
 1. *Input Sanitization:* Implement strict allow-listing and shell-escaping functions on all web forms to prevent command chaining (e.g., ;, &&, |).
 2. *Principle of Least Privilege:* Regularly audit system binaries (find / -perm -4000) and remove SUID bits from administrative tools like nmap, vim, or find that allow interactive shell escapes.
+
+
+
+
+# Network-to-Root Exploitation & SUID Remediation
+
+### *1. Objective*
+To perform a complete compromise of a Linux-based target starting from external network reconnaissance, moving to service-level brute forcing, and concluding with local privilege escalation via a misconfigured binary.
+
+---
+
+### *2. Phase I: Reconnaissance*
+* *Tool*: Nmap
+* *Command*: nmap -sV -sC -p- 192.168.56.101
+* *Discovery: Identified **Port 22 (SSH)* as open and running OpenSSH 4.7p1.
+
+---
+
+### *3. Phase II: Brute Force Attack*
+* *Tool*: THC Hydra
+* *Target*: SSH (Port 22)
+* *Execution*: Performed an online dictionary attack against the msfadmin account using the rockyou.txt wordlist.
+* *Result: **Success*. Found valid credentials (msfadmin:msfadmin).
+* ![hydrabrut](https://github.com/user-attachments/assets/5ab04492-974e-4ef3-81e4-1cf255e6ef08)
+
+
+---
+
+### *4. Phase III: Privilege Escalation (The Root Gain)*
+* *Vulnerability: Misconfigured **SUID (Set User ID)* bit on the Nmap binary.
+* *Exploit*: Leveraged Nmap's interactive mode to escape the restricted shell.
+* *Outcome: Scaled permissions from a standard user to **root*.
+![priv](https://github.com/user-attachments/assets/4a30642d-648c-4312-8348-691c0cb24f1e)
+
+---
+
+### *5. Phase IV: Remediation (The Fix)*
+* *Action*: Executed chmod u-s /usr/bin/nmap to strip the Set-UID bit.
+* *Verification*: Confirmed the binary now runs with standard permissions (-rwxr-xr-x).
+* ![remedy](https://github.com/user-attachments/assets/6fd00e3c-8ff6-4da1-a58d-aa161cf578fb)
+
